@@ -1,12 +1,12 @@
 #ifndef __STACK_H__
     #define __STACK_H__
 
-    #include "../tool.h"
+    #include "stdbool.h"
 
     typedef struct Stack Stack;
     extern const unsigned int STACK_SIZE;
 
-    Stack* new_stack();
+    Stack* new_stack(unsigned int value_size);
     void delete_stack(Stack* stack);
 
     void* Stack_get_top(Stack* stack);

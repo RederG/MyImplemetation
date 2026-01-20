@@ -1,7 +1,7 @@
 #ifndef __VECTOR__
     #define __VECTOR__
 
-    #include "../tool.h"
+    #include "stdbool.h"
 
     typedef struct Vector Vector;
     extern const unsigned int VECTOR_SIZE;
@@ -73,7 +73,7 @@
     char* Vector_get_data_block(Vector* vector);
     
     // Create dynamicaly a new vector
-    Vector* new_vector();
+    Vector* new_vector(unsigned int value_size);
 
     // Delete dynamicaly a vector
     void delete_vector(Vector* vector);

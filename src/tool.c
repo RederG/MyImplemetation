@@ -31,9 +31,9 @@ unsigned int Tool_create_id(){
 }
 
 void Tool_Timer_init(){
-    all_timer_ends   = new_map(sizeof(unsigned int), sizeof(long long));
-    all_timer_starts = new_map(sizeof(unsigned int), sizeof(long long));
-    all_timer_states = new_map(sizeof(unsigned int), sizeof(TimerState));
+    all_timer_ends   = new_map(sizeof(unsigned int));
+    all_timer_starts = new_map(sizeof(unsigned int));
+    all_timer_states = new_map(sizeof(unsigned int));
 }
 
 void Tool_Timer_terminate(){

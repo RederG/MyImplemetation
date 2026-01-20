@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "../../include/MyImplemetation/vector.h"
 #include "../../include/tool.h"
 
@@ -12,6 +13,7 @@ typedef struct Vector{
     VectorElement* elements;
     unsigned int size;
     unsigned int capacity;
+    unsigned int value_size;
 } Vector;
 
 Vector* current_vector = nullptr;
@@ -272,11 +274,14 @@ bool Vector_copy(Vector* vector, Vector* destination){
     if(vector == destination)
         return false;
     free(destination->elements);
-    destination->elements = new_vector_elements(vector->capacity);
-    for(int i = 0; i < vector->size; i++)
-        destination->elements[i].data = vector->elements[i].data;
+    destination->elements = calloc(vector->capacity, sizeof(VectorElement));
+    for(int i = 0; i < vector->size; i++){
+        destination->elements[i].data = malloc(vector->value_size);
+        memmove(destination->elements[i].data, vector->elements[i].data, vector->value_size);
+    }
     destination->size = vector->size;
     destination->capacity = vector->capacity;
+    destination->value_size = vector->value_size;
     return true;
 }
 
@@ -289,11 +294,12 @@ char* Vector_get_data_block(Vector* vector){
     return data_block;
 }
 
-Vector* new_vector(){
+Vector* new_vector(unsigned int value_size){
     Vector* vector = malloc(sizeof(Vector));
     vector->capacity = 0;
     vector->size = 0;
     vector->elements = nullptr;
+    vector->value_size = value_size;
     return vector;
 }
 

@@ -1,13 +1,13 @@
 #include "../../include/MyImplemetation/vector.h"
 #include "../../include/MyImplemetation/pair.h"
 #include "../../include/MyImplemetation/map.h"
+#include "../../include/tool.h"
 
 const unsigned int MAP_SIZE = sizeof(void*) + sizeof(unsigned int) * 4;
 
 typedef struct Map{
     Vector* list;
     unsigned int key_size;
-    unsigned int value_size;
 } Map;
 
 Pair* current_pair = nullptr;
@@ -17,6 +17,10 @@ void* Map_get(void* key, Map* map){
     if(Map_has(key, map))
         return current_pair->second;
     return nullptr;
+}
+
+unsigned int Map_get_size(Map* map){
+    return Vector_get_size(map->list);
 }
 
 bool Map_has(void* key, Map* map){
@@ -72,16 +76,23 @@ bool Map_set(void* key, void* value, Map* map){
     return false;
 }
 
+bool Map_copy(Map* map, Map* destination){
+    if(Vector_copy(map->list, destination->list));{
+        destination->key_size = map->key_size;
+        return true;
+    }
+    return false;
+}
+
 void Map_clear(Map* map){
     if(!Vector_is_empty(map->list))
         Vector_clear(map->list);
 }
 
-Map* new_map(unsigned int key_size, unsigned int value_size){
+Map* new_map(unsigned int key_size){
     Map* map = malloc(sizeof(Map));
-    map->list = new_vector();
+    map->list = new_vector(sizeof(Pair));
     map->key_size = key_size;
-    map->value_size = value_size;
     return map;
 }
 

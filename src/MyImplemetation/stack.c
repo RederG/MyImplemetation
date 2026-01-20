@@ -1,9 +1,12 @@
 #include "../../include/MyImplemetation/stack.h"
 #include "../../include/MyImplemetation/map.h"
 #include "../../include/MyImplemetation/vector.h"
+#include "../../include/tool.h"
 
 typedef struct Vector Vector;
-typedef struct Stack{} Stack;
+typedef struct Stack{
+    unsigned int value_size;
+} Stack;
 
 const unsigned int STACK_SIZE = 0;
 
@@ -11,16 +14,17 @@ Map* all_stacks_vector = nullptr;
 
 void verify_stacks_vector(){
     if(all_stacks_vector == nullptr)
-        all_stacks_vector = new_map(POINTER_SIZE, VECTOR_SIZE);
+        all_stacks_vector = new_map(POINTER_SIZE);
 }
 
-Stack* new_stack(){
+Stack* new_stack(unsigned int value_size){
     verify_stacks_vector(nullptr);
 
     Stack* stack = malloc(sizeof(Stack));
-    unsigned long long* address = malloc(sizeof(unsigned long long));
-    *address = Tool_get_address(stack);
-    Map_add(address, new_vector(), all_stacks_vector);
+    stack->value_size = value_size;
+    unsigned long long* address = malloc(sizeof(Address));
+    *address = (Address)(stack);
+    Map_add(address, new_vector(value_size), all_stacks_vector);
 
     return stack;
 }
