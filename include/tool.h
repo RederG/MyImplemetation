@@ -16,6 +16,8 @@
         Counting, Stopped, Paused
     } TimerState;
 
+    typedef unsigned long long Address;
+
     extern const unsigned int POINTER_SIZE;
 
     // Throw an error with the given message

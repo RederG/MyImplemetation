@@ -11,7 +11,7 @@ file(GLOB_RECURSE MINE_IMPLEMETATION
     "src/tool.c"
 )
 
-target_sources(${TestAppName} PUBLIC src/main.c)
+target_sources(${TestAppName} PUBLIC src/main.c src/test/car.c)
 target_link_libraries(${TestAppName} PUBLIC MyImplemetation)
 
 add_library(MyImplemetation ${MINE_IMPLEMETATION})

@@ -1,9 +1,27 @@
 #include <stdio.h>
-#include "../include/MyImplemetation/map.h"
+#include "../include/tool.h"
+#include "../include/test/car.h"
 
 int main(int argsi, char* argsc){
-    Map* map = new_map(POINTER_SIZE, POINTER_SIZE);
+    Object* vehicle = new_object(Car_class(), 0.25f);
 
-    delete_map(map);
+    double* speed = nullptr;
+    speed = Object_get(CAR_VELOCITY, speed, vehicle, nullptr);
+
+    Object_do(CAR_SPEED_UP, vehicle);
+    speed = Object_get(CAR_VELOCITY, speed, vehicle, nullptr);
+
+    Object_do(CAR_SPEED_UP, vehicle);
+    speed = Object_get(CAR_VELOCITY, speed, vehicle, nullptr);
+
+    Object_do(CAR_SPEED_UP, vehicle);
+    speed = Object_get(CAR_VELOCITY, speed, vehicle, nullptr);
+
+    Object_do(CAR_SLOW_DOWN, vehicle);
+    speed = Object_get(CAR_VELOCITY, speed, vehicle, nullptr);
+
+    Object_do(CAR_SLOW_DOWN, vehicle);
+    speed = Object_get(CAR_VELOCITY, speed, vehicle, nullptr);
+
     return 0;
 }

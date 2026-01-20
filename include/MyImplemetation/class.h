@@ -1,21 +1,42 @@
 #ifndef __CLASS_H__
     #define __CLASS_H__
 
+    #include <stdarg.h>
+    #include <stdlib.h>
+
+    #define arg_value(arg, type, return_name)\
+                type* return_name = malloc(sizeof(type));\
+                *return_name = va_arg(arg, type);
+
     typedef struct Class Class;
 
-    typedef struct MethodParameters MethodParameters;
+    typedef struct Object Object;
 
-    typedef struct Object{
-        void* (*get)(unsigned int, Object*);
-        void  (*set)(unsigned int, void*, Object*);
-        void* (*execute)(unsigned int, MethodParameters*);
-    } Object;
+    typedef void (*Constructor)(Class*, Object*, va_list*);
+    typedef void* (*Method)(Object*, va_list*);
 
     typedef enum AttribAccess{
         private, public
     } AttribAccess;
 
-    Class* new_class(unsigned int attrib_number, AttribAccess access);
-    Object* new_object(Class* parent_class);
+    typedef struct Attribute{
+        unsigned int* id;
+        AttribAccess access;
+    } Attribute;
+
+    void terminate_classes();
+
+    Class* new_class(unsigned int attrib_number, unsigned int facultative_attrib_number, unsigned int methods_number, Constructor constructor, Class* parent_class, Attribute* attribs, unsigned int* attrib_size, Method* methods);
+    Object* new_object(Class* base_class, ...);
+    void delete_object(Object* obj);
+    void delete_class(Class* c);
+
+    Class* Class_get_parent(Class* c);
+    void Class_set_method(unsigned int index, unsigned int* id, Class* base_class);
+    Class* Object_get_class(Object* obj);
+    void* Object_get(unsigned int attribute_id, void* result, Object* obj, Method method);
+    void  Object_set(unsigned int attribute_id, void* data, Object* obj, Method method);
+    void Object_set_class(Class* base_class, Object* obj, Constructor constructor);
+    void* Object_do(unsigned int method_id, Object* obj, ...);
 
 #endif

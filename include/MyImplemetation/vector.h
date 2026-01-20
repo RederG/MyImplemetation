@@ -71,9 +71,12 @@
 
     // Gets all of the data in "char*"
     char* Vector_get_data_block(Vector* vector);
+
+    // Gets the index of the given element
+    unsigned int* Vector_get_index(void* data, Vector* vector);
     
     // Create dynamicaly a new vector
-    Vector* new_vector();
+    Vector* new_vector(unsigned int value_size);
 
     // Delete dynamicaly a vector
     void delete_vector(Vector* vector);

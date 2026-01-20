@@ -11,8 +11,9 @@
     bool Map_remove(void* key, Map* map);
     bool Map_add(void* key, void* value, Map* map);
     bool Map_set(void* key, void* value, Map* map);
+    bool Map_copy(Map* map, Map* destination);
     void Map_clear(Map* map);
-    Map* new_map(unsigned int key_size, unsigned int value_size);
+    Map* new_map(unsigned int key_size);
     void delete_map(Map* map);
 
 #endif
