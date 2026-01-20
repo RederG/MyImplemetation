@@ -1,11 +1,27 @@
 #include <stdio.h>
 #include "../include/tool.h"
-#include "../src/test/car.h"
+#include "../include/test/car.h"
 
 int main(int argsi, char* argsc){
-    Object* car = new_object(Car_class(), 0.5f);
-    Object_do(CAR_ROLL_OUT, car);
-    float* velocity = Object_get(CAR_VELOCITY, car, nullptr);
-    terminate_classes();
+    Object* vehicle = new_object(Car_class(), 0.25f);
+
+    double* speed = nullptr;
+    speed = Object_get(CAR_VELOCITY, speed, vehicle, nullptr);
+
+    Object_do(CAR_SPEED_UP, vehicle);
+    speed = Object_get(CAR_VELOCITY, speed, vehicle, nullptr);
+
+    Object_do(CAR_SPEED_UP, vehicle);
+    speed = Object_get(CAR_VELOCITY, speed, vehicle, nullptr);
+
+    Object_do(CAR_SPEED_UP, vehicle);
+    speed = Object_get(CAR_VELOCITY, speed, vehicle, nullptr);
+
+    Object_do(CAR_SLOW_DOWN, vehicle);
+    speed = Object_get(CAR_VELOCITY, speed, vehicle, nullptr);
+
+    Object_do(CAR_SLOW_DOWN, vehicle);
+    speed = Object_get(CAR_VELOCITY, speed, vehicle, nullptr);
+
     return 0;
 }

@@ -77,7 +77,7 @@ bool Map_set(void* key, void* value, Map* map){
 }
 
 bool Map_copy(Map* map, Map* destination){
-    if(Vector_copy(map->list, destination->list));{
+    if(Vector_copy(map->list, destination->list)){
         destination->key_size = map->key_size;
         return true;
     }

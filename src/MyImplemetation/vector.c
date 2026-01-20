@@ -21,14 +21,7 @@ unsigned int current_index = 0;
 void* current_data;
 
 VectorElement* new_vector_elements(unsigned int size){
-    VectorElement* new_elements = malloc(sizeof(VectorElement)*size);
-    size_t i;
-    for(i = 0; i < size; i++){
-        VectorElement* element = malloc(sizeof(VectorElement));
-        element->data = nullptr;
-        new_elements[i] = *element;
-    }
-    return new_elements;
+    return calloc(size, sizeof(VectorElement));
 }
 
 void* Vector_get(unsigned int index, Vector* vector){
@@ -107,7 +100,7 @@ bool Vector_push(void* data, Vector* vector){
 
         VectorElement* new_element = malloc(sizeof(VectorElement));
         if(data != nullptr)
-            new_element->data = malloc(sizeof(data));
+            new_element->data = malloc(vector->value_size);
         new_element->data = data;
         vector->elements = new_element;
     }
@@ -117,8 +110,10 @@ bool Vector_push(void* data, Vector* vector){
 
             VectorElement* new_elements = new_vector_elements(vector->capacity);
             size_t i;
-            for(i = 0; i < vector->size; i++)
-                new_elements[i].data = vector->elements[i].data;
+            for(i = 0; i < vector->size; i++){
+                new_elements[i].data = malloc(vector->value_size);
+                memcpy(new_elements[i].data, vector->elements[i].data, vector->value_size);
+            }
             
             vector->elements = new_elements;
         }
@@ -142,11 +137,13 @@ bool Vector_insert(unsigned int index, void* data, Vector* vector){
             vector->capacity *= 2;
 
         VectorElement* new_elements = new_vector_elements(vector->capacity);
-        for(int i = 0; i < index; i++)
-            new_elements[i].data = vector->elements[i].data;
+        for(int i = 0; i < index; i++){
+            new_elements[i].data = malloc(vector->value_size);
+            memcpy(new_elements[i].data, vector->elements[i].data, vector->value_size);
+        }
         
         VectorElement* element = malloc(sizeof(VectorElement));
-        element->data = malloc(sizeof(data));
+        element->data = malloc(vector->value_size);
         element->data = data;
         new_elements[index] = *element;
 
@@ -174,11 +171,15 @@ bool Vector_remove(unsigned int index, Vector* vector){
     if((vector->size - 1) < (vector->capacity/2))
         vector->capacity /= 2;
 
-    VectorElement* new_elements = new_vector_elements(vector->capacity);
-    for(int i = 0; i < index; i++)
-        new_elements[i].data = vector->elements[i].data;
-    for(int i = index + 1; i < vector->size; i++)
-        new_elements[i - 1].data = vector->elements[i].data;
+    VectorElement* new_elements = calloc(vector->capacity, sizeof(VectorElement));
+    for(int i = 0; i < index; i++){
+        new_elements[i].data = malloc(vector->value_size);
+        memcpy(new_elements[i].data, vector->elements[i].data, vector->value_size);
+    }
+    for(int i = index + 1; i < vector->size; i++){
+        new_elements[i - 1].data = malloc(vector->value_size);
+        memcpy(new_elements[i - 1].data, vector->elements[i].data, vector->value_size);
+    }
 
     free(vector->elements);
     vector->elements = new_elements;
@@ -195,8 +196,10 @@ bool Vector_remove_last(Vector* vector){
         vector->capacity /= 2;
     
     VectorElement* new_elements = new_vector_elements(vector->capacity);
-    for(int i = 0; i < vector->size - 1; i++)
-        new_elements[i].data = vector->elements[i].data;
+    for(int i = 0; i < vector->size - 1; i++){
+        new_elements[i].data = malloc(vector->value_size);
+        memcpy(new_elements[i].data, vector->elements[i].data, vector->value_size);
+    }
     
     unsigned int capacity = vector->capacity;
     unsigned int size = vector->size;
@@ -218,9 +221,8 @@ bool Vector_remove_begin(Vector* vector){
     
     VectorElement* new_elements = new_vector_elements(vector->capacity);
     for(int i = 1; i < vector->size; i++){
-        void* new_data = new_elements[i - 1].data;
-        void* data = vector->elements[i].data;
-        new_elements[i - 1].data = vector->elements[i].data;
+        new_elements[i - 1].data = malloc(vector->value_size);
+        memcpy(new_elements[i - 1].data, vector->elements[i].data, vector->value_size);
     }
     
     free(vector->elements);
@@ -262,8 +264,10 @@ void Vector_resize(unsigned int new_size, Vector* vector){
     }
     VectorElement* new_elements = new_vector_elements(vector->capacity);
     for(i = 0; i < vector->size; i++){
-        if(i < new_size)
-            new_elements[i].data = vector->elements[i].data;
+        if(i < new_size){
+            new_elements[i].data = malloc(vector->value_size);
+            memcpy(new_elements[i].data, vector->elements[i].data, vector->value_size);
+        }
     }
     free(vector->elements);
     vector->elements = new_elements;
@@ -276,8 +280,8 @@ bool Vector_copy(Vector* vector, Vector* destination){
     free(destination->elements);
     destination->elements = calloc(vector->capacity, sizeof(VectorElement));
     for(int i = 0; i < vector->size; i++){
-        destination->elements[i].data = malloc(vector->value_size);
-        memmove(destination->elements[i].data, vector->elements[i].data, vector->value_size);
+        destination->elements[i].data = malloc(sizeof(vector->value_size));
+        memcpy(destination->elements[i].data, vector->elements[i].data, vector->value_size);
     }
     destination->size = vector->size;
     destination->capacity = vector->capacity;
@@ -292,6 +296,18 @@ char* Vector_get_data_block(Vector* vector){
         data_block[i] = *(char*)(vector->elements[i].data);
     data_block[vector->size] = '\0';
     return data_block;
+}
+
+unsigned int* Vector_get_index(void* data, Vector* vector){
+    unsigned int* index = nullptr;
+    for(int i = 0; i < vector->size; i++){
+        if(vector->elements[i].data == data){
+            index = malloc(sizeof(unsigned int));
+            *index = i;
+            break;
+        }
+    }
+    return index;
 }
 
 Vector* new_vector(unsigned int value_size){

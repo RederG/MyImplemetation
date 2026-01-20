@@ -22,8 +22,8 @@ Stack* new_stack(unsigned int value_size){
 
     Stack* stack = malloc(sizeof(Stack));
     stack->value_size = value_size;
-    unsigned long long* address = malloc(sizeof(Address));
-    *address = (Address)(stack);
+    unsigned long long* address = malloc(sizeof(unsigned long long));
+    *address = Tool_get_address(stack);
     Map_add(address, new_vector(value_size), all_stacks_vector);
 
     return stack;
