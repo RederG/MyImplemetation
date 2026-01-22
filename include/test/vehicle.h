@@ -1,5 +1,5 @@
-#ifndef __CAR_H__
-    #define __CAR_H__
+#ifndef __VEHICLE_H__
+    #define __VEHICLE_H__
 
     #include "../MyImplemetation/class.h"
 
