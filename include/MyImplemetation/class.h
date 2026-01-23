@@ -2,10 +2,6 @@
     #define CLASS_CREATION 0x88ff
 #endif
 
-#ifndef CLASS_DEFINITION
-    #define CLASS_DEFINITION 0xf8f8
-#endif
-
 #ifndef __CLASS_H__
     #define __CLASS_H__
 
@@ -17,10 +13,10 @@
     A class, it can represents an idea/object/functionality/etc :
     - It builds instances of this idea/object/functionality/etc
     
-    It will contain : 
+    It contains : 
     - a constructor
     - all methods
-    - all default attributes
+    - all different attributes
     - the number of methods and attributes
     - its parent class (when doing inheritance)
     */
@@ -38,16 +34,18 @@
     /*
     A function that a class provides to do something with its objects
     - the "va_list*" contains every arguments passed in "Object_do(...)"
-    (These arguments are stored in the "...", the last argument of "Object_do(...)")
+    [Note] : These arguments are stored in the "...", the last argument of "Object_do(...)"
     - It will return a "void*" that points to the method's return value
     */
     typedef void*   (*ObjectMethod)         (Object*, va_list*);
 
     /*
-    A function that a class provides to set up all attributes of an object when its creation
+    A function that a class provides to set up the base class and all attributes of an object when its creation
     - the "va_list*" contains every arguments passed in "new_object(...)"
-    (These arguments are stored in the "...", the last argument of "new_object(...)")
-    - It will return an "Object*" that points to the object that has been created
+    [Note] : These arguments are stored in the "...", the last argument of "new_object(...)"
+    - You must call "Object_set_class(...)" to set up the object's base class and its attributes before doing anything else on the constructor
+    - You can define all default values of every attributes after calling "Object_set_class(...)"
+    [Note] : The default values must not be declared in compilation but dynamically, or you will uncounter a problem
     */
     typedef void    (*ObjectConstructor)    (Object*, va_list*);
 
@@ -74,28 +72,17 @@
     } ObjectAttrib;
 
     /*
-    When doing inheritance, each class has diffrent default attributes that the object copies.
-    ObjectAttribPerClass will provide an organization to see the class owner of the attribute and the object's attributes itself.
-
-    It contains :
-    - The class owner
-    - The object's attrib that is related to the class owner
-    */
-    typedef struct ObjectAttribPerClass{
-        Class* base_class;
-        ObjectAttrib* attribs;
-    } ObjectAttribPerClass;
-
-    /*
-    To get each method that a class provide, we will need to assign each by an id.
+    To get each method that a class provide, we will need to assign each with an id.
     ObjectMethodId will give us that.
 
     It contains :
     - The pointer to the id of the method
+    - The pointer to the pointer of the return value
     - The method that related to the id
     */
     typedef struct ObjectMethodId{
         unsigned int* id;
+        void** return_value;
         ObjectMethod method;
     } ObjectMethodId;
 
@@ -120,35 +107,29 @@
     /* 
     Gets the copy of an attribute from the object that corresponds with the "attrib_id"
     - The "context" is a method (function) that it is used to verify if "Object_get(...)" can return the copy of the attrib
-    (Set it to "nullptr" if you don't want to check about the context, especially when using the object outside the Class creation file)
+    [Note] : Set it to "nullptr" if you don't want to check about the context, especially when using the object outside the "class creation file"
     - If the attrib's getter is public, "Object_get(...)" will return the copy
     - If the attrib's getter is private, "Object_get(...)" will return the copy if the "context" is a method for "obj"
     - If the object doesn't have the attrib with "attrib_id" it will return "nullptr"
-    - The "Class_owner_of_attribute" is a "Class*" that points to the class that have the attribute corresponding to "attrib_id"
-    (Set it to "nullptr" if the attribute is on the Class of the object)
     */
-    void*   Object_get(unsigned int attrib_id, Object* obj, ObjectMethod context, Class* Class_owner_of_attribute);
+    void*   Object_get(unsigned int attrib_id, Object* obj, ObjectMethod context);
 
     /* 
     Sets the value of an attribute from the object that corresponds with the "attrib_id"
     - The "context" is a method (function) that it is used to verify if "Object_get(...)" can modify the value of the attrib
-    (Set it to "nullptr" if you don't want to check about the context, especially when using the object outside the Class creation file)
+    [Note] : Set it to "nullptr" if you don't want to check about the context, especially when using the object outside the "class creation file"
     - If the attrib's setter is public, "Object_set(...)" will modify the value
     - If the attrib's setter is private, "Object_set(...)" will modify the value if the "context" is a method for "obj"
     - If the object doesn't have the attrib with "attrib_id", it will return false and true instead
-    - The "Class_owner_of_attribute" is a "Class*" that points to the class that have the attribute corresponding to "attrib_id"
-    (Set it to "nullptr" if the attribute is on the Class of the object)
     */
-    bool    Object_set(unsigned int attrib_id, void* data, Object* obj, ObjectMethod context, Class* Class_owner_of_attribute);
+    bool    Object_set(unsigned int attrib_id, void* data, Object* obj, ObjectMethod context);
 
     /*
-    Calls the method that corresponds to "method_id" and return its return value
-    - The "Class_owner_of_method" is a "Class*" that points to the class having the method with "method_id"
-    (Setting it to "nullptr" indicates that the method is on the base_class of the object)
-    - If the object's class doesn't have the method, it will return "nullptr"
+    Calls the method that corresponds to "method_id" and puts its return value on the method's id's return value
+    - If the object's class doesn't have the method, the "*method_return_value" will set to "nullptr"
     - The arguments passed in the "..." will be passed to the methods' "va_list*"
     */
-    void    Object_do(unsigned int method_id, Object* object, Class* Class_owner_of_method, void** method_return_value, ...);
+    void    Object_do(unsigned int method_id, Object* object, ...);
 
     // Gets the object's class
     Class*  Object_class(Object* obj);
@@ -160,7 +141,7 @@
     void    Class_terminate();
 
     // Deletes a class
-    void delete_class(Class* some_class);
+    void    delete_class(Class* some_class);
 
 #endif
 
@@ -174,20 +155,19 @@
         /*
         Creates a new class
         */
-        Class* Class_create(ObjectConstructor constructor, ObjectContentNumber content_number, ObjectMethodId methods[], ObjectAttrib default_attribs[], Class* parent_class);
+        Class* new_class(ObjectConstructor constructor, ObjectContentNumber content_number, ObjectMethodId methods[], ObjectAttrib default_attribs[], Class* parent_class);
         
         /*
         Gets the method that corresponds to the id
         - It will return "nullptr" if the "base_class" doesn't have the method
         */
-        ObjectMethod Class_get_method(unsigned int id, Class* base_class);
+        ObjectMethodId* Class_get_method(unsigned int id, Class* base_class);
 
         /*
         Gets the object's attribute that corresponds to the id
         - It will return "nullptr" if the "Class_owner" doesn't have the attribute
-        - If "Class_owner" is "nullptr", the attribute must in the obj's base_class
         */
-        ObjectAttrib* Object_get_attrib(unsigned int id, Object* obj, Class* Class_owner);
+        ObjectAttrib* Object_get_attrib(unsigned int id, Object* obj);
     #endif
 
     #undef CLASS_FILE

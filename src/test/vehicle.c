@@ -13,7 +13,7 @@ bool* VEHICLE_ROLL_OUT_RETURN_VALUE = nullptr;
 void Vehicle_constructor(Object* obj, va_list* args){
     double* default_velocity = malloc(sizeof(double));
     *default_velocity = 0.25;
-    Object_set(VEHICLE_VELOCITY, default_velocity, obj, (ObjectMethod)Vehicle_constructor, nullptr);
+    Object_set(VEHICLE_VELOCITY, default_velocity, obj, (ObjectMethod)Vehicle_constructor);
 }
 
 void* Vehicle_roll_out(Object* obj, va_list* args){
@@ -23,12 +23,12 @@ void* Vehicle_roll_out(Object* obj, va_list* args){
         *result = false;
     else
         *result = true;
-    Object_set(VEHICLE_VELOCITY, new_velocity, obj, &Vehicle_roll_out, nullptr);
+    Object_set(VEHICLE_VELOCITY, new_velocity, obj, &Vehicle_roll_out);
     return result;
 }
 
 ObjectMethodId Vehicle_methods[] = {
-    {&VEHICLE_ROLL_OUT, &Vehicle_roll_out}
+    {&VEHICLE_ROLL_OUT, (void**)&VEHICLE_ROLL_OUT_RETURN_VALUE, &Vehicle_roll_out}
 };
 
 ObjectAttrib Vehicle_attributes[] = {
@@ -41,7 +41,14 @@ ObjectContentNumber Vehicle_content_number = {
 };
 
 Class* VehicleClass(){
-    if(Vehicle == nullptr)
-        Vehicle = Class_create(&Vehicle_constructor, Vehicle_content_number, Vehicle_methods, Vehicle_attributes, nullptr);
+    if(Vehicle == nullptr){
+        Vehicle = new_class(
+            &Vehicle_constructor, 
+            Vehicle_content_number, 
+            Vehicle_methods, 
+            Vehicle_attributes, 
+            nullptr
+        );
+    }
     return Vehicle;
 }
