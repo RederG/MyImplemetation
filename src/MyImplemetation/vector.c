@@ -105,19 +105,14 @@ bool Vector_push(void* data, Vector* vector){
     if(vector->size == 0 && vector->elements == nullptr){
         vector->size = 1;
         vector->capacity = 2;
-        vector->elements = nullptr;
-
-        VectorElement* new_element = malloc(sizeof(VectorElement));
-        if(data != nullptr)
-            new_element->data = malloc(vector->value_size);
-        new_element->data = data;
-        vector->elements = new_element;
+        vector->elements = new_vector_elements(2);
+        vector->elements[0].data = malloc(vector->value_size);
+        memcpy(vector->elements[0].data, data, vector->value_size);
     }
     else if(vector->size > 0){
         if(vector->capacity <= vector->size + 1){
-            vector->capacity *= 2;
 
-            VectorElement* new_elements = new_vector_elements(vector->capacity);
+            VectorElement* new_elements = new_vector_elements(vector->capacity * 2);
             size_t i;
             for(i = 0; i < vector->size; i++){
                 new_elements[i].data = malloc(vector->value_size);
@@ -125,8 +120,10 @@ bool Vector_push(void* data, Vector* vector){
             }
             
             Vector_set_elements(new_elements, vector);
+            vector->capacity *= 2;
         }
-        vector->elements[vector->size].data = data;
+        vector->elements[vector->size].data = malloc(vector->value_size);
+        memcpy(vector->elements[vector->size].data, data, vector->value_size);
         vector->size += 1;
     }
     return true;
@@ -153,7 +150,7 @@ bool Vector_insert(unsigned int index, void* data, Vector* vector){
         
         VectorElement* element = malloc(sizeof(VectorElement));
         element->data = malloc(vector->value_size);
-        element->data = data;
+        memcpy(element->data, data, vector->value_size);
         new_elements[index] = *element;
 
         for(int i = index + 1; i < vector->size + 1; i++)
@@ -168,7 +165,7 @@ bool Vector_insert(unsigned int index, void* data, Vector* vector){
 bool Vector_set(unsigned int index, void* data, Vector* vector){
     if(index >= vector->size)
         return false;
-    vector->elements[index].data = data;
+    memcpy(vector->elements[index].data, data, vector->value_size);
     return true;
 }
 
@@ -238,9 +235,7 @@ bool Vector_remove_begin(Vector* vector){
 }
 
 void Vector_clear(Vector* vector){
-    int i;
-    for(i = vector->capacity - 1; i >= 0; i--)
-        free(&vector->elements[i]);
+    free(vector->elements);
     vector->size = 0;
     vector->capacity = 0;
     vector->elements = nullptr;
