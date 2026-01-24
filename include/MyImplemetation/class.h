@@ -43,9 +43,8 @@
     A function that a class provides to set up the base class and all attributes of an object when its creation
     - the "va_list*" contains every arguments passed in "new_object(...)"
     [Note] : These arguments are stored in the "...", the last argument of "new_object(...)"
-    - You must call "Object_set_class(...)" to set up the object's base class and its attributes before doing anything else on the constructor
-    - You can define all default values of every attributes after calling "Object_set_class(...)"
-    [Note] : The default values must not be declared in compilation but dynamically, or you will uncounter a problem
+    - You can define all default values of every attributes on this function
+    [Note] : The default values must not be declared in compilation time but dynamically, or you will uncounter a problem
     */
     typedef void    (*ObjectConstructor)    (Object*, va_list*);
 
@@ -72,7 +71,7 @@
     } ObjectAttrib;
 
     /*
-    To get each method that a class provide, we will need to assign each with an id.
+    To get each method that a class provides, we will need to assign each with an id.
     ObjectMethodId will give us that.
 
     It contains :
@@ -99,6 +98,7 @@
     } ObjectContentNumber;
 
     // Creates a new object from a base class
+    // - You can pass the arguments of the constructor on the "..."
     Object* new_object(Class* base_class, ...);
 
     // Deletes an object
@@ -126,7 +126,7 @@
 
     /*
     Calls the method that corresponds to "method_id" and puts its return value on the method's id's return value
-    - If the object's class doesn't have the method, the "*method_return_value" will set to "nullptr"
+    - If the object's class doesn't have the method, the "method's return value" will set to "nullptr"
     - The arguments passed in the "..." will be passed to the methods' "va_list*"
     */
     void    Object_do(unsigned int method_id, Object* object, ...);
