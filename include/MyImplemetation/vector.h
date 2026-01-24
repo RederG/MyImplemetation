@@ -73,7 +73,7 @@
     char* Vector_get_data_block(Vector* vector);
 
     // Gets the index of the given element
-    unsigned int* Vector_get_index(void* data, Vector* vector);
+    void Vector_get_index(void* data, unsigned int** index, Vector* vector);
     
     // Create dynamicaly a new vector
     Vector* new_vector(unsigned int value_size);

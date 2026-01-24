@@ -248,7 +248,7 @@ bool Vector_is_empty(Vector* vector){
 }
 
 bool Vector_fill(void* data, unsigned int begin, unsigned int last, Vector* vector){
-    if(begin >= vector->size || last > vector->size)
+    if(begin >= vector->size || last > vector->size || last <= begin)
         return false;
     for(int i = begin; i < last; i++)
         memcpy(vector->elements[i].data, data, vector->value_size);
@@ -297,16 +297,29 @@ char* Vector_get_data_block(Vector* vector){
     return data_block;
 }
 
-unsigned int* Vector_get_index(void* data, Vector* vector){
-    unsigned int* index = nullptr;
-    for(int i = 0; i < vector->size; i++){
-        if(vector->elements[i].data == data){
-            index = malloc(sizeof(unsigned int));
-            *index = i;
-            break;
+void Vector_get_index(void* data, unsigned int** index, Vector* vector){
+    size_t i;
+    if(index == nullptr)
+        return;
+    Vector_get_next(nullptr);
+    while(Vector_get_next(vector)){
+        for(i = 0; i < vector->value_size; i++){
+            char element_byte = ((char*)Vector_get_current_data())[i];
+            char data_byte = ((char*)data)[i];
+            if(element_byte != data_byte)
+                break;
+            else if(i == vector->value_size - 1){
+                if(*index != nullptr)
+                    free(*index);
+                *index = malloc(sizeof(unsigned int));
+                **index = Vector_get_current_index();
+                return;
+            }
         }
     }
-    return index;
+    if(*index != nullptr)
+        free(*index);
+    *index = nullptr;
 }
 
 Vector* new_vector(unsigned int value_size){

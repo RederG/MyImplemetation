@@ -175,7 +175,8 @@ void delete_object(Object* obj){
             free(&obj->attribs[i]);
         obj->base_class = nullptr;
         obj->attribs = nullptr;
-        unsigned int* index = Vector_get_index(obj, all_objects);
+        unsigned int* index = nullptr;
+        Vector_get_index(obj, &index, all_objects);
         if(index != nullptr)
             Vector_remove(*index, all_objects);
     }
@@ -257,7 +258,8 @@ Class* new_class(ObjectConstructor constructor, ObjectContentNumber content_numb
 
 void delete_class(Class* some_class){
     if(some_class != nullptr){
-        unsigned int* index = Vector_get_index(some_class, all_classes);
+        unsigned int* index = nullptr;
+        Vector_get_index(some_class, &index, all_classes);
         if(index != nullptr)
             Vector_remove(*index, all_classes);
     }
