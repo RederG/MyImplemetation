@@ -21,28 +21,42 @@ typedef struct Object{
     ObjectAttrib* attribs;
 } Object;
 
-Vector* all_classes;
-Vector* all_objects;
+Vector_create_header(ObjectPtr)
+Vector_create_header(ClassPtr)
+
+Vector_create_implemetation(ObjectPtr)
+Vector_create_implemetation(ClassPtr)
+
+Vector_ClassPtr* all_classes;
+Vector_ObjectPtr* all_objects;
+Vector_controller_ClassPtr* all_classes_ctrl;
+Vector_controller_ObjectPtr* all_objects_ctrl;
 
 void Class_init(){
-    if(all_classes == nullptr)
-        all_classes = new_vector(sizeof(Class));
-    if(all_objects == nullptr)
-        all_objects = new_vector(sizeof(Object));
+    if(all_classes == nullptr){
+        all_classes = new_vector_ClassPtr();
+        all_classes_ctrl = new_vector_controller_ClassPtr();
+    }
+    if(all_objects == nullptr){
+        all_objects = new_vector_ObjectPtr();
+        all_objects_ctrl = new_vector_controller_ObjectPtr();
+    }
 }
 
 void Class_terminate(){
-    Vector_get_next(nullptr);
-    while(Vector_get_next(all_objects)){
-        delete_object(Vector_get_current_data());
-        Vector_get_next(nullptr);
+    all_objects_ctrl->get_next(nullptr);
+    while(all_objects_ctrl->get_next(all_objects)){
+        delete_object(all_objects_ctrl->current_ObjectPtr());
+        all_objects_ctrl->get_next(nullptr);
     }
-    while(Vector_get_next(all_classes)){
-        delete_class(Vector_get_current_data());
-        Vector_get_next(nullptr);
+    while(all_classes_ctrl->get_next(all_classes)){
+        delete_class(all_classes_ctrl->current_ClassPtr());
+        all_classes_ctrl->get_next(nullptr);
     }
-    all_classes = nullptr;
-    all_objects = nullptr;
+    delete_vector_ClassPtr(all_classes);
+    delete_vector_ObjectPtr(all_objects);
+    delete_vector_controller_ClassPtr(all_classes_ctrl);
+    delete_vector_controller_ObjectPtr(all_objects_ctrl);
 }
 
 ObjectMethodId* Class_get_method(unsigned int id, Class* base_class){
@@ -163,7 +177,7 @@ Object* new_object(Class* base_class, ...){
         base_class->constructor(new_obj, &args);
         va_end(args);
 
-        Vector_push(new_obj, all_objects);
+        all_objects_ctrl->push(new_obj, all_objects);
     }
     return new_obj;
 }
@@ -176,9 +190,9 @@ void delete_object(Object* obj){
         obj->base_class = nullptr;
         obj->attribs = nullptr;
         unsigned int* index = nullptr;
-        Vector_get_index(obj, &index, all_objects);
+        all_objects_ctrl->search(obj, &index, all_objects);
         if(index != nullptr)
-            Vector_remove(*index, all_objects);
+            all_objects_ctrl->erase(*index, all_objects);
     }
 }
 
@@ -252,15 +266,15 @@ Class* new_class(ObjectConstructor constructor, ObjectContentNumber content_numb
     Class_set_up_methods(new_class, methods, content_number.methods_number);
     set_attrib_id(default_attribs, content_number.attribs_number);
     Class_set_up_attribs(new_class, default_attribs, content_number.attribs_number);
-    Vector_push(new_class, all_classes);
+    all_classes_ctrl->push(new_class, all_classes);
     return new_class;
 }
 
 void delete_class(Class* some_class){
     if(some_class != nullptr){
         unsigned int* index = nullptr;
-        Vector_get_index(some_class, &index, all_classes);
+        all_classes_ctrl->search(some_class, &index, all_classes);
         if(index != nullptr)
-            Vector_remove(*index, all_classes);
+            all_classes_ctrl->erase(*index, all_classes);
     }
 }

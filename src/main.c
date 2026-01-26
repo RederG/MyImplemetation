@@ -1,37 +1,40 @@
 #include <stdio.h>
 #include "../include/tool.h"
-#include "../include/MyImplemetation/vector.h"
+#include "../include/MyImplemetation/all_vectors.h"
 
 int main(int argsi, char* argsc){
-    Vector* vector = new_vector(sizeof(unsigned int));
-    unsigned int value1 = 1400;
-    unsigned int value2 = 140;
-    unsigned int value3 = 14;
-    unsigned int value4 = 41;
-    unsigned int value5 = 410;
-    unsigned int value6 = 4100;
-    unsigned int value7 = 4114;
-    unsigned int value8 = 4141;
-    unsigned int value9 = 1414;
-    unsigned int value10 = 1441;
+    Vector_controller(String, controller);
+    Vector(String, names);
 
-    Vector_push(&value1, vector);
-    Vector_push(&value2, vector);
-    Vector_push(&value3, vector);
-    Vector_push(&value5, vector);
-    Vector_push(&value6, vector);
-    Vector_push(&value7, vector);
-    Vector_push(&value8, vector);
-    Vector_push(&value9, vector);
-    Vector_push(&value10, vector);
+    controller.push("Optimus Prime", &names);
+    controller.push("Bumblebee", &names);
+    controller.push("Arcee", &names);
+    controller.push("Elita One", &names);
+    controller.push("Megatron", &names);
+    controller.push("Starscream", &names);
+    controller.push("Windblade", &names);
+    controller.push("Primus", &names);
+    controller.push("Megatronus Prime, the Fallen", &names);
+    controller.push("Unicron", &names);
 
     unsigned int* index = nullptr;
-    Vector_get_index(&value4, &index, vector);
+    controller.search("Elita One", &index, &names);
     if(index != nullptr)
-        printf("Value4 is on the %dth case of the vector\n", *index + 1);
+        printf("Elita One found at index %d\n\n", *index);
     else
-        printf("Value4 is not on the vector");
+        printf("Elita One not found\n\n");
 
-    delete_vector(vector);
+    controller.fill(0, names.size, "Alpha Trion", &names);
+    controller.get_next(nullptr);
+    while(controller.get_next(&names))
+        printf("%d => %s\n", controller.current_index(), controller.current_String());
+
+    printf("\n");
+    controller.resize(50, &names);
+    controller.fill(15, 30, "Cybertron", &names);
+    controller.get_next(nullptr);
+    while(controller.get_next(&names))
+        printf("%d => %s\n", controller.current_index(), controller.current_String());
+
     return 0;
 }

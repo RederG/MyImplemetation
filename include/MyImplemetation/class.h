@@ -31,6 +31,9 @@
     */
     typedef struct Object Object;
 
+    typedef Class* ClassPtr;
+    typedef Object* ObjectPtr;
+
     /*
     A function that a class provides to do something with its objects
     - the "va_list*" contains every arguments passed in "Object_do(...)"
